@@ -826,6 +826,10 @@ PrefabInstance:
       value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 7710056192946883355, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
+      propertyPath: laneDistance
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7710056192946883355, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
       propertyPath: squeezeDuration
       value: 0.8
       objectReference: {fileID: 0}
