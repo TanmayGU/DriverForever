@@ -1,52 +1,50 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-   
     private CharacterController controller;
 
-    // Direction vector for movement, including forward, jump, and gravity
+    // Direction vector for movement
     private Vector3 direction;
 
-    // Speed at which the player moves forward
-    public float forwardSpeed;
+    // Forward movement speed
+    public float forwardSpeed = 5f;
 
-    // Lane management variables
-    private int desiredLane = 1; // Default lane (0 = left, 1 = middle, 2 = right)
-    public float laneDistance = 2.5f; // Distance between two lanes
+    // Lane management
+    private int desiredLane = 1; // Default to the middle lane (0 = left, 1 = middle, 2 = right)
+    public float laneDistance = 2.5f; // Distance between lanes
 
-    // Jump mechanics
-    public float jumpForce; // Strength of the jump
-    public float Gravity = -20; // Gravity applied to the player when in the air
+    // Jump and Gravity
+    public float jumpForce = 10f;
+    public float gravity = -20f;
 
-    // Squeeze mechanics
-    private Vector3 originalScale; // Stores the player's original scale
-    public float squeezeFactor = 0.5f; // Factor to reduce the height during a squeeze
-    public float squeezeDuration = 0.8f; // Time the player stays squeezed
-    private bool isSqueezing = false; // Tracks if the player is currently squeezing
+    // Squeeze (crouch)
+    private Vector3 originalScale;
+    public float squeezeFactor = 0.5f;
+    public float squeezeDuration = 0.8f;
+    private bool isSqueezing = false;
 
-    // Start is called before the first frame update
+    // Reference to AR camera
+    public Transform arCameraTransform;
+
     void Start()
     {
-        
+        // Initialize the CharacterController
         controller = GetComponent<CharacterController>();
 
-        // Save the original scale of the player for later use
+        // Save the player's original scale for squeeze logic
         originalScale = transform.localScale;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Set the forward movement speed
+        // Set forward movement speed
         direction.z = forwardSpeed;
 
-        // Check if the player is grounded before allowing a jump
+        // Jump logic
         if (controller.isGrounded)
         {
-            
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 Jump();
@@ -54,82 +52,77 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // Apply gravity when the player is not grounded
-            direction.y += Gravity * Time.deltaTime;
+            // Apply gravity when the player is in the air
+            direction.y += gravity * Time.deltaTime;
         }
 
-        // Lane movement logic
-        if (Input.GetKeyDown(KeyCode.RightArrow)) // Move to the right lane
+        // Handle lane movement
+        HandleLaneSwitching();
+
+        // Squeeze logic (crouch)
+        if (Input.GetKeyDown(KeyCode.DownArrow) && !isSqueezing)
         {
-            desiredLane++;
-            if (desiredLane == 3) // Prevent moving out of bounds (only 3 lanes)
-                desiredLane = 2;
+            StartCoroutine(Squeeze());
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) // Move to the left lane
-        {
-            desiredLane--;
-            if (desiredLane == -1) // Prevent moving out of bounds
-                desiredLane = 0;
-        }
-
-        // Calculate the target position based on the current lane
+        // Calculate the target position based on the desired lane
         Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
 
-        // Adjust target position based on the desired lane
-        if (desiredLane == 0) // Left lane
+        if (desiredLane == 0)
         {
             targetPosition += Vector3.left * laneDistance;
         }
-        else if (desiredLane == 2) // Right lane
+        else if (desiredLane == 2)
         {
             targetPosition += Vector3.right * laneDistance;
         }
 
-        // Move the player smoothly to the target lane
-        transform.position = targetPosition;
-
-        // Squeeze logic when the Down Arrow key is pressed
-        if (Input.GetKeyDown(KeyCode.DownArrow) && !isSqueezing)
-        {
-            // Start the squeeze coroutine
-            StartCoroutine(Squeeze());
-        }
+        // Smoothly move the player to the target lane position
+        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 10);
     }
 
-    
     private void FixedUpdate()
     {
-        // Move the player based on the direction vector
+        // Move the player forward based on the calculated direction
         controller.Move(direction * Time.fixedDeltaTime);
     }
 
-    
     private void Jump()
     {
-        // Set the upward velocity for the jump
+        // Apply upward force for the jump
         direction.y = jumpForce;
     }
 
-    // Coroutine to handle the squeeze action
+    private void HandleLaneSwitching()
+    {
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            desiredLane++;
+            if (desiredLane == 3)
+                desiredLane = 2; // Stay within bounds
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            desiredLane--;
+            if (desiredLane == -1)
+                desiredLane = 0; // Stay within bounds
+        }
+    }
+
     private IEnumerator Squeeze()
     {
-        // Mark the player as squeezing
         isSqueezing = true;
 
-        // Calculate the squeezed scale (reduce height, keep other dimensions the same)
+        // Reduce the player's height
         Vector3 squeezedScale = new Vector3(originalScale.x, originalScale.y * squeezeFactor, originalScale.z);
-
-        // Apply the squeezed scale to the player
         transform.localScale = squeezedScale;
 
-        // Wait for the specified duration
+        // Wait for the squeeze duration
         yield return new WaitForSeconds(squeezeDuration);
 
-        // Revert the player's scale back to the original
+        // Revert to the original scale
         transform.localScale = originalScale;
-
-        // Mark the player as no longer squeezing
         isSqueezing = false;
     }
 }

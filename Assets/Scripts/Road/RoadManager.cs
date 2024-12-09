@@ -10,6 +10,9 @@ public class RoadManager : MonoBehaviour
     // Position along the Z-axis where the next road will be spawned
     public float zSpawn = 0;
 
+    public Vector3 startPosition = Vector3.zero;
+
+
     // Length of each road prefab
     public float roadLenght = 30;
 
@@ -53,13 +56,9 @@ public class RoadManager : MonoBehaviour
     // Method to spawn a road prefab at the correct position
     public void SpawnRoad(int roadIndex)
     {
-        // Instantiate the road prefab at the specified position
-        GameObject go = Instantiate(roadPrefabs[roadIndex], transform.forward * zSpawn, transform.rotation);
-
-        // Add the newly spawned road to the activeRoads list
+        Vector3 spawnPosition = startPosition + transform.forward * zSpawn;
+        GameObject go = Instantiate(roadPrefabs[roadIndex], spawnPosition, transform.rotation);
         activeRoads.Add(go);
-
-        // Move the zSpawn position forward for the next road
         zSpawn += roadLenght;
     }
 

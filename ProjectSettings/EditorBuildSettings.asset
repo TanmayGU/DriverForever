@@ -6,10 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Main Menu.unity
-    guid: e351ed85de8f54d4ab8df2d52d4b2cd1
-  - enabled: 1
-    path: Assets/Scenes/Main Scene.unity
-    guid: 0e677a6d32c390241aa9ef419eae13d6
+    path: Assets/Scenes/TanmayAR Scene/TanmayScene.unity
+    guid: 2cf2e8d7aaf4fe245b441e4263a91dcc
   m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 408b822ccb7fd5a46a1506cf5ebf29d2, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 0efeeed0294d35f48a2d33b5809e163c, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 54f5a22bc7a36154b895fbbdc5d06252, type: 2}
