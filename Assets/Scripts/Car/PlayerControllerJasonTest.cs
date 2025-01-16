@@ -17,14 +17,14 @@ public class PlayerControllerJasonTest : MonoBehaviour
     public float Gravity = -20f;
 
     private Vector3 originalScale;
-    private Vector3 targetScale; // 动态目标形态
-    public float squeezeSpeed = 5f; // 平滑过渡速度
+    private Vector3 targetScale; // Dynamic target shape
+    public float squeezeSpeed = 5f; // Smooth transition speed
 
-    private AudioSource audioSource; // 音频源
+    private AudioSource audioSource; // Audio source
     private const int sampleRate = 48000;
     private const int sampleSize = 1024;
     private float[] audioSamples = new float[sampleSize];
-    public float volumeThreshold = 0.02f; // 音量阈值
+    public float volumeThreshold = 0.02f; // Volume threshold
 
     void Start()
     {
@@ -32,10 +32,10 @@ public class PlayerControllerJasonTest : MonoBehaviour
         originalScale = transform.localScale;
         targetScale = originalScale;
 
-        // 添加 AudioSource 并与麦克风连接
+        // Add AudioSource and connect it to the microphone
         audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.loop = true; // 使麦克风输入循环播放
-        audioSource.mute = true; // 静音以免麦克风输入回传到音箱
+        audioSource.loop = true; // Enable looping for microphone input
+        audioSource.mute = true; // Mute to prevent microphone input from playing back through speakers
 
         if (Microphone.devices.Length > 0)
         {
@@ -47,7 +47,7 @@ public class PlayerControllerJasonTest : MonoBehaviour
                 Debug.Log($"Microphone '{selectedMic}' is recording.");
                 while (!(Microphone.GetPosition(selectedMic) > 0)) { }
                 Debug.Log($"Microphone started. Position: {Microphone.GetPosition(selectedMic)}");
-                audioSource.Play(); // 确保 AudioSource 开始播放
+                audioSource.Play(); // Ensure AudioSource starts playing
             }
             else
             {
@@ -105,10 +105,10 @@ public class PlayerControllerJasonTest : MonoBehaviour
 
         transform.position = targetPosition;
 
-        // 音频分析
+        // Audio analysis
         AnalyzeAudio();
 
-        // 平滑过渡到目标比例
+        // Smooth transition to target scale
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * squeezeSpeed);
     }
 
@@ -131,40 +131,38 @@ public class PlayerControllerJasonTest : MonoBehaviour
             return;
         }
 
-        // 获取音频数据
+        // Retrieve audio data
         audioSource.clip.GetData(audioSamples, 0);
         float volume = GetVolume(audioSamples);
 
         Debug.Log($"Volume: {volume}");
 
-        // 设定阈值
-        float silenceThreshold = 0.003f;   // **无声音（或环境噪音）阈值**
-        float lowVolumeThreshold = 0.1f; // **低于此值 → 变矮变宽**
-        float highVolumeThreshold = 0.3f; // **高于此值 → 变高变瘦**
+        // Set volume thresholds
+        float silenceThreshold = 0.003f;   // **Silence (or background noise) threshold**
+        float lowVolumeThreshold = 0.1f; // **Below this value → Shrink to wide and short form**
+        float highVolumeThreshold = 0.3f; // **Above this value → Stretch to tall and thin form**
 
-        if (volume < silenceThreshold) // **无声音（保持原状）**
+        if (volume < silenceThreshold) // **Silence detected (Keep original shape)**
         {
             targetScale = originalScale;
             Debug.Log("Silence detected: Keeping original shape.");
         }
-        else if (volume < lowVolumeThreshold) // **变矮变宽**
+        else if (volume < lowVolumeThreshold) // **Shrink to wide and short form**
         {
             targetScale = new Vector3(originalScale.x * 1.4f, originalScale.y * 0.6f, originalScale.z);
             Debug.Log("Low Volume detected: Shrinking to wide and short form.");
         }
-        else if (volume > highVolumeThreshold) // **变高变瘦**
+        else if (volume > highVolumeThreshold) // **Stretch to tall and thin form**
         {
             targetScale = new Vector3(originalScale.x * 0.6f, originalScale.y * 1.4f, originalScale.z);
             Debug.Log("High Volume detected: Stretching to tall and thin form.");
         }
-        else // **普通音量（保持原状）**
+        else // **Normal volume (Keep original shape)**
         {
             targetScale = originalScale;
             Debug.Log("Normal Volume: Keeping original shape.");
         }
     }
-
-
 
     private float GetVolume(float[] samples)
     {
@@ -180,6 +178,6 @@ public class PlayerControllerJasonTest : MonoBehaviour
 
     private void ResetScale()
     {
-        targetScale = originalScale; // 恢复默认比例
+        targetScale = originalScale; // Restore default scale
     }
 }

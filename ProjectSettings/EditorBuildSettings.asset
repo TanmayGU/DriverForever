@@ -4,16 +4,6 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-<<<<<<< Updated upstream
-  m_Scenes: []
-  m_configObjects:
-    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 9f46daa81611eea43883e2a0656f90d2, type: 2}
-    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: c7fc2b0e02d91f84ca5d2a2e1c80a230, type: 2}
-    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: b6c0c673722856d48969f8791081638f, type: 2}
-    com.unity.xr.magicleap.magic_leap_settings: {fileID: 11400000, guid: 092b450a3318dbc4abe0b95e4115e2e0, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: c553d22de4f03364ea1f1face4d186e3, type: 2}
-    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 5e6e62b958ae49d4695d110bff8d45cc, type: 2}
-=======
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/Main Menu.unity
@@ -24,5 +14,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/JasonScene.unity
     guid: 081b65734a2569848a8fe8455a06a65f
-  m_configObjects: {}
->>>>>>> Stashed changes
+  m_configObjects:
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 5e6e62b958ae49d4695d110bff8d45cc, type: 2}
