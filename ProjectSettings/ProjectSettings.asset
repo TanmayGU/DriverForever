@@ -162,7 +162,10 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.DefaultCompany.DriverForever
+<<<<<<< Updated upstream
     iPhone: com.DefaultCompany.DriverForever
+=======
+>>>>>>> Stashed changes
   buildNumber:
     Standalone: 0
     VisionOS: 0
