@@ -3,44 +3,33 @@ using UnityEngine;
 
 public class RoadManager : MonoBehaviour
 {
-    public GameObject[] roadPrefabs; // Assign your road prefabs
-    private List<GameObject> activeRoads = new List<GameObject>();
+    [SerializeField] private GameObject roadPrefab; // Tillgänglig via Unity Inspector
+    private List<GameObject> roadSegments = new List<GameObject>();
+    private float newZPosition = 0;
 
-    public Transform playerTransform; // Assign the car transform
-    private float zSpawn = 0;
-    public float roadLength = 30;
-    public int numberOfRoads = 5;
-
-    void Start()
+    public void InitializeRoads()
     {
-        for (int i = 0; i < numberOfRoads; i++)
+        for (int i = 0; i < 5; i++)
         {
-            if (i == 0)
-                SpawnRoad(0); // First road
-            else
-                SpawnRoad(Random.Range(0, roadPrefabs.Length));
+            var road = Instantiate(roadPrefab, new Vector3(0, 0, i * 30), Quaternion.identity);
+            road.name = $"Road {i}";
+            roadSegments.Add(road);
         }
+    }
+
+    public void RecycleRoad(GameObject road)
+    {
+        newZPosition += 30f;
+        road.transform.position = new Vector3(0, 0, newZPosition);
+        road.SetActive(true);
+        Debug.Log($"Recycled road: {road.name} to position: {road.transform.position}");
     }
 
     void Update()
     {
-        if (playerTransform.position.z - 35 > zSpawn - (numberOfRoads * roadLength))
+        foreach (var road in roadSegments)
         {
-            SpawnRoad(Random.Range(0, roadPrefabs.Length));
-            DeleteRoad();
+            Debug.Log($"Road segment {road.name} is at position {road.transform.position}");
         }
-    }
-
-    void SpawnRoad(int roadIndex)
-    {
-        GameObject road = Instantiate(roadPrefabs[roadIndex], Vector3.forward * zSpawn, Quaternion.identity);
-        activeRoads.Add(road);
-        zSpawn += roadLength;
-    }
-
-    void DeleteRoad()
-    {
-        Destroy(activeRoads[0]);
-        activeRoads.RemoveAt(0);
     }
 }

@@ -1,74 +1,156 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
 
 public class ARCarPlacement : MonoBehaviour
 {
-    public GameObject carPrefab; // Assign your car prefab in the Inspector
-    private GameObject spawnedCar; // The car object that will be placed in AR
-    private bool gameStarted = false; // Track if the game has started or not
+    public GameObject carPrefab; // The car to place
+    public GameObject roadPrefab; // The road to place
+    public ARTrackedImageManager imageManager; // Reference to the AR Tracked Image Manager
+    public float carYOffset = 0.5f; // Y-offset for the car placement, adjustable in Inspector
 
-    private ARRaycastManager raycastManager; // AR raycasting manager
-    private List<ARRaycastHit> hits = new List<ARRaycastHit>(); // List to store raycast hits
-    private ARPlaneManager planeManager; // AR Plane manager to detect planes
+    private GameObject spawnedCar;
+    private GameObject spawnedRoad;
+    private bool roadsInitialized = false; // Prevent redundant initialization
 
-    public GameObject groundMessage; // A message or UI element that tells the user to tap on the ground
+    // Keep track of already processed images
+    private HashSet<string> trackedImages = new HashSet<string>();
 
-    void Start()
+    private void OnEnable()
     {
-        // Find the AR Raycast Manager and AR Plane Manager in the scene
-        raycastManager = FindObjectOfType<ARRaycastManager>();
-        planeManager = FindObjectOfType<ARPlaneManager>();
-
-        // Disable the ground message initially
-        if (groundMessage != null)
+        if (imageManager != null)
         {
-            groundMessage.SetActive(true); // Show message to tap on the detected plane
+            imageManager.trackedImagesChanged += OnTrackedImagesChanged;
+            Debug.Log("ARTrackedImageManager.trackedImagesChanged event subscribed in ARCarPlacement.");
         }
     }
 
-    void Update()
+    private void OnDisable()
     {
-        // If the game hasn't started yet
-        if (!gameStarted)
+        if (imageManager != null)
         {
-            // Check if there's any touch input on the screen
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                Vector2 touchPosition = Input.GetTouch(0).position;
-
-                // Perform raycast to detect AR planes
-                if (raycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinBounds))
-                {
-                    // Get the position and rotation of the detected plane hit
-                    Pose hitPose = hits[0].pose;
-
-                    // If the car isn't spawned, instantiate it at the touch position
-                    if (spawnedCar == null)
-                    {
-                        spawnedCar = Instantiate(carPrefab, hitPose.position, hitPose.rotation);
-                    }
-                    else
-                    {
-                        // If the car is already placed, move it to the new position
-                        spawnedCar.transform.position = hitPose.position;
-                    }
-
-                    // Hide the message and start the game
-                    if (groundMessage != null)
-                    {
-                        groundMessage.SetActive(false);
-                    }
-
-                    // Set gameStarted to true to indicate the game has started
-                    gameStarted = true;
-                }
-            }
+            imageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+            Debug.Log("ARTrackedImageManager.trackedImagesChanged event unsubscribed in ARCarPlacement.");
         }
-        else
+    }
+
+    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
+    {
+        foreach (var trackedImage in eventArgs.added)
         {
-            // Handle the gameplay logic after the game has started (e.g., car movement)
+            Debug.Log($"PlaceObjects called for added image: {trackedImage.referenceImage.name}");
+            PlaceObjects(trackedImage);
+        }
+
+        foreach (var trackedImage in eventArgs.updated)
+        {
+            Debug.Log($"PlaceObjects called for updated image: {trackedImage.referenceImage.name}");
+            PlaceObjects(trackedImage);
+        }
+
+        foreach (var trackedImage in eventArgs.removed)
+        {
+            Debug.Log($"RemoveObjects called for removed image: {trackedImage.referenceImage.name}");
+            RemoveObjects(trackedImage);
+        }
+    }
+
+    private void PlaceObjects(ARTrackedImage trackedImage)
+    {
+        if (roadsInitialized)
+        {
+            Debug.Log("Roads already initialized. Skipping PlaceObjects.");
+            return;
+        }
+
+        // Skip if the image is already tracked
+        if (trackedImages.Contains(trackedImage.referenceImage.name))
+        {
+            Debug.Log($"Tracked image '{trackedImage.referenceImage.name}' already processed.");
+            return;
+        }
+
+        // Destroy previously spawned road and car if they exist
+        if (spawnedRoad != null)
+        {
+            Debug.Log("Destroying previously spawned road.");
+            Destroy(spawnedRoad);
+            spawnedRoad = null;
+        }
+
+        if (spawnedCar != null)
+        {
+            Debug.Log("Destroying previously spawned car.");
+            Destroy(spawnedCar);
+            spawnedCar = null;
+        }
+
+        // Get position and rotation from tracked image
+        Vector3 position = trackedImage.transform.position;
+        Quaternion rotation = trackedImage.transform.rotation;
+
+        // Calculate scale based on image size
+        Vector2 imageSize = trackedImage.size;
+        float roadScaleFactor = imageSize.x;
+        float carScaleFactor = roadScaleFactor * 0.8f;
+
+        // Spawn the road
+        spawnedRoad = Instantiate(roadPrefab, position, rotation);
+        spawnedRoad.transform.localScale = new Vector3(roadScaleFactor, 1, roadScaleFactor);
+        spawnedRoad.transform.position += new Vector3(0, 0.01f, 0); // Adjust Y-position
+        Debug.Log($"Road instantiated at position: {spawnedRoad.transform.position}");
+
+        // Parent the road to RoadManager
+        RoadManager roadManager = FindObjectOfType<RoadManager>();
+        if (roadManager != null)
+        {
+            spawnedRoad.transform.SetParent(roadManager.transform);
+            Debug.Log($"Road parented to: {roadManager.name}");
+        }
+
+        // Spawn the car
+        spawnedCar = Instantiate(carPrefab, position, rotation);
+        spawnedCar.transform.localScale = new Vector3(carScaleFactor, carScaleFactor, carScaleFactor);
+        spawnedCar.transform.position += rotation * Vector3.forward * (imageSize.y * 0.5f);
+        spawnedCar.transform.position += new Vector3(0, carYOffset, 0); // Adjust Y-position
+        Debug.Log($"Car instantiated at position: {spawnedCar.transform.position}");
+
+        // Initialize roads
+        if (roadManager != null)
+        {
+            roadManager.InitializeRoads(position, rotation, roadScaleFactor);
+            Debug.Log("Roads initialized by ARCarPlacement.");
+        }
+
+        // Add tracked image to the set
+        trackedImages.Add(trackedImage.referenceImage.name);
+        Debug.Log($"Tracked image '{trackedImage.referenceImage.name}' added to processed set.");
+
+        // Mark roads as initialized
+        roadsInitialized = true;
+        GameManager.StartGame();
+    }
+
+    private void RemoveObjects(ARTrackedImage trackedImage)
+    {
+        if (trackedImages.Contains(trackedImage.referenceImage.name))
+        {
+            trackedImages.Remove(trackedImage.referenceImage.name);
+            Debug.Log($"Tracked image '{trackedImage.referenceImage.name}' removed from processed set.");
+
+            if (spawnedCar != null)
+            {
+                Debug.Log("Destroying spawned car.");
+                Destroy(spawnedCar);
+                spawnedCar = null;
+            }
+
+            if (spawnedRoad != null)
+            {
+                Debug.Log("Destroying spawned road.");
+                Destroy(spawnedRoad);
+                spawnedRoad = null;
+            }
         }
     }
 }

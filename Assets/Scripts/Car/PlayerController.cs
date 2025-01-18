@@ -1,65 +1,59 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController controller;
-    private Vector3 direction;
-    private int desiredLane = 1; // 0: left, 1: middle, 2: right
-
-    public float laneDistance = 2.5f; // Distance between lanes
-    public float jumpForce = 10f; // Force applied during jump
-    public float gravity = -9.81f; // Gravity applied when in air
-    public float lateralSpeed = 10f; // Speed of lane-switching
-
-    private float fixedZPosition; // Keep the car fixed on the z-axis
+    public float laneFactor = 0.88f; // Percentage of road width to calculate lane distance
+    private float laneDistance;
+    private int desiredLane = 1; // Default to center lane
+    private RoadManager roadManager;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
-        fixedZPosition = transform.position.z; // Store the initial z-position of the car
+        roadManager = FindObjectOfType<RoadManager>();
+        if (roadManager != null && roadManager.roadPrefab != null)
+        {
+            laneDistance = roadManager.roadPrefab.transform.localScale.x * laneFactor;
+            Debug.Log($"Calculated lane distance: {laneDistance}");
+        }
+        else
+        {
+            Debug.LogWarning("RoadManager or roadPrefab not found! Using default lane distance.");
+            laneDistance = 3f; // Default fallback
+        }
     }
 
     void Update()
     {
-        // Maintain a fixed z-position
-        direction.z = 0;
+        if (!GameManager.gameStarted) return;
 
-        // Handle jumping
-        if (controller.isGrounded)
-        {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-                direction.y = jumpForce;
-        }
-        else
-        {
-            direction.y += gravity * Time.deltaTime;
-        }
+        HandleTouchInput();
 
-        // Handle lane switching
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-            desiredLane = Mathf.Max(0, desiredLane - 1);
+        float targetX = (desiredLane - 1) * laneDistance; // Center is lane 1
+        Vector3 targetPosition = new Vector3(targetX, transform.position.y, transform.position.z);
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-            desiredLane = Mathf.Min(2, desiredLane + 1);
-
-        // Determine the target position for lateral movement
-        Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
-        if (desiredLane == 0)
-            targetPosition += Vector3.left * laneDistance;
-        else if (desiredLane == 2)
-            targetPosition += Vector3.right * laneDistance;
-
-        // Smoothly interpolate to the target position
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, new Vector3(targetPosition.x, transform.position.y, fixedZPosition), lateralSpeed * Time.deltaTime);
-
-        // Apply only lateral and vertical movement
-        transform.position = new Vector3(smoothedPosition.x, transform.position.y, fixedZPosition);
+        transform.position = Vector3.Lerp(transform.position, targetPosition, 10f * Time.deltaTime);
     }
 
-    void FixedUpdate()
+    private void HandleTouchInput()
     {
-        // Apply movement based on the calculated direction (only vertical for jumping)
-        controller.Move(direction * Time.fixedDeltaTime);
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            Vector2 touchPosition = Input.GetTouch(0).position;
+
+            if (touchPosition.x < Screen.width / 2) MoveLeft();
+            else MoveRight();
+        }
+    }
+
+    public void MoveLeft()
+    {
+        if (desiredLane > 0) desiredLane--;
+        Debug.Log($"Moved to lane {desiredLane}");
+    }
+
+    public void MoveRight()
+    {
+        if (desiredLane < 2) desiredLane++;
+        Debug.Log($"Moved to lane {desiredLane}");
     }
 }
