@@ -1,35 +1,53 @@
+// RoadManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 
 public class RoadManager : MonoBehaviour
 {
-    [SerializeField] private GameObject roadPrefab; // Tillgänglig via Unity Inspector
-    private List<GameObject> roadSegments = new List<GameObject>();
-    private float newZPosition = 0;
+    public GameObject roadPrefab;
+    public int roadCount = 5;
+    public float roadLength = 30f;
 
-    public void InitializeRoads()
+    private Queue<GameObject> roadSegments = new Queue<GameObject>();
+
+    public void InitializeRoads(Vector3 startPosition, Quaternion rotation, float scaleFactor)
     {
-        for (int i = 0; i < 5; i++)
+        ClearRoads();
+
+        for (int i = 0; i < roadCount; i++)
         {
-            var road = Instantiate(roadPrefab, new Vector3(0, 0, i * 30), Quaternion.identity);
-            road.name = $"Road {i}";
-            roadSegments.Add(road);
+            Vector3 position = startPosition + new Vector3(0, 0, i * roadLength);
+            GameObject road = Instantiate(roadPrefab, position, rotation);
+            road.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
+            roadSegments.Enqueue(road);
         }
+
+        Debug.Log("Roads initialized.");
     }
 
-    public void RecycleRoad(GameObject road)
+    public void RecycleRoad()
     {
-        newZPosition += 30f;
-        road.transform.position = new Vector3(0, 0, newZPosition);
-        road.SetActive(true);
-        Debug.Log($"Recycled road: {road.name} to position: {road.transform.position}");
+        if (roadSegments.Count == 0)
+        {
+            Debug.LogWarning("No roads available to recycle!");
+            return;
+        }
+
+        GameObject oldestRoad = roadSegments.Dequeue();
+        Vector3 newPosition = oldestRoad.transform.position + new Vector3(0, 0, roadLength * roadCount);
+        oldestRoad.transform.position = newPosition;
+        roadSegments.Enqueue(oldestRoad);
+
+        Debug.Log($"Recycled road to position: {newPosition}");
     }
 
-    void Update()
+    private void ClearRoads()
     {
         foreach (var road in roadSegments)
         {
-            Debug.Log($"Road segment {road.name} is at position {road.transform.position}");
+            Destroy(road);
         }
+
+        roadSegments.Clear();
     }
 }
