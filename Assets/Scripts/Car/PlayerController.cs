@@ -29,11 +29,12 @@ public class PlayerController : MonoBehaviour
 
         HandleTouchInput();
 
-        float targetX = (desiredLane - 1) * laneDistance; // Center is lane 1
-        Vector3 targetPosition = new Vector3(targetX, transform.position.y, transform.position.z);
+        float targetX = (desiredLane - 1) * laneDistance;
+        Vector3 targetPosition = new Vector3(targetX, transform.position.y, transform.position.z + 5f * Time.deltaTime);
 
         transform.position = Vector3.Lerp(transform.position, targetPosition, 10f * Time.deltaTime);
     }
+
 
     private void HandleTouchInput()
     {

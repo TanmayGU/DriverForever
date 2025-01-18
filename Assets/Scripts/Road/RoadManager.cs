@@ -9,6 +9,17 @@ public class RoadManager : MonoBehaviour
     public float roadLength = 30f;
 
     private Queue<GameObject> roadSegments = new Queue<GameObject>();
+    private Transform player;
+
+    void Start()
+    {
+        player = FindObjectOfType<PlayerController>()?.transform;
+
+        if (player == null)
+        {
+            Debug.LogError("PlayerController not found! Ensure a player object is in the scene.");
+        }
+    }
 
     public void InitializeRoads(Vector3 startPosition, Quaternion rotation, float scaleFactor)
     {
@@ -25,6 +36,18 @@ public class RoadManager : MonoBehaviour
         Debug.Log("Roads initialized.");
     }
 
+    void Update()
+    {
+        if (player == null) return;
+
+        float playerZ = player.position.z;
+
+        if (roadSegments.Count > 0 && roadSegments.Peek().transform.position.z + roadLength < playerZ)
+        {
+            RecycleRoad();
+        }
+    }
+
     public void RecycleRoad()
     {
         if (roadSegments.Count == 0)
@@ -34,7 +57,7 @@ public class RoadManager : MonoBehaviour
         }
 
         GameObject oldestRoad = roadSegments.Dequeue();
-        Vector3 newPosition = oldestRoad.transform.position + new Vector3(0, 0, roadLength * roadCount);
+        Vector3 newPosition = oldestRoad.transform.position + new Vector3(0, 0, roadLength * roadSegments.Count);
         oldestRoad.transform.position = newPosition;
         roadSegments.Enqueue(oldestRoad);
 

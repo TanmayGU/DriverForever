@@ -633,10 +633,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5cd8a1ab66fcf94589c5970ac99f3ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPrefab: {fileID: 5528044877124190855, guid: c0a7891edb17ab046a93b5e6ae071e53, type: 3}
+  carPrefab: {fileID: 8718404262838426138, guid: fe25dcb5c295c2c48b2ecc46a1ccb73f, type: 3}
   roadPrefab: {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
   imageManager: {fileID: 411006528}
-  carYOffset: 0.15
+  carYOffset: 0.5
 --- !u!4 &1039885303
 Transform:
   m_ObjectHideFlags: 0
@@ -830,10 +830,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roadPrefab: {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
-  initialRoadCount: 5
+  roadCount: 5
   roadLength: 30
-  roadSpeed: 10
-  carTransform: {fileID: 8866937995584464497, guid: c0a7891edb17ab046a93b5e6ae071e53, type: 3}
 --- !u!1 &1863381929
 GameObject:
   m_ObjectHideFlags: 0

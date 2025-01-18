@@ -51,23 +51,15 @@ public class ARCarPlacement : MonoBehaviour
         }
     }
 
+    // ARCarPlacement.cs
     private void PlaceObjects(ARTrackedImage trackedImage)
     {
-        if (roadsInitialized)
-        {
-            Debug.Log("Roads already initialized. Skipping PlaceObjects.");
-            return;
-        }
-
-        if (trackedImages.Contains(trackedImage.referenceImage.name)) return;
+        if (roadsInitialized) return;
 
         Vector3 position = trackedImage.transform.position;
         Quaternion rotation = trackedImage.transform.rotation;
 
-        Vector2 imageSize = trackedImage.size;
-        float roadScaleFactor = imageSize.x;
-        float carScaleFactor = roadScaleFactor * 0.8f;
-
+        float roadScaleFactor = trackedImage.size.x;
         spawnedRoad = Instantiate(roadPrefab, position, rotation);
         spawnedRoad.transform.localScale = new Vector3(roadScaleFactor, 1, roadScaleFactor);
 
@@ -78,13 +70,12 @@ public class ARCarPlacement : MonoBehaviour
         }
 
         spawnedCar = Instantiate(carPrefab, position, rotation);
-        spawnedCar.transform.localScale = new Vector3(carScaleFactor, carScaleFactor, carScaleFactor);
         spawnedCar.transform.position += new Vector3(0, carYOffset, 0);
 
-        trackedImages.Add(trackedImage.referenceImage.name);
         roadsInitialized = true;
         GameManager.StartGame();
     }
+
 
     private void RemoveObjects(ARTrackedImage trackedImage)
     {
