@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8718404262838426138}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.03, y: -1.27, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laneFactor: 0.88
+  roadSpeed: 10
 --- !u!1001 &3017356693439416643
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -170,11 +171,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 01679a0651a1ca546bd230fdcffcfdfb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.06
+      value: -0.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 01679a0651a1ca546bd230fdcffcfdfb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.62
+      value: -0.64
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 01679a0651a1ca546bd230fdcffcfdfb, type: 3}
       propertyPath: m_LocalPosition.z

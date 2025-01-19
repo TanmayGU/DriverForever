@@ -1,4 +1,3 @@
-// RoadManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,20 +5,10 @@ public class RoadManager : MonoBehaviour
 {
     public GameObject roadPrefab;
     public int roadCount = 5;
-    public float roadLength = 30f;
+    public float roadLength = 15.0f; // Match prefab Z scale
+    public float roadSpeed = 10f;
 
     private Queue<GameObject> roadSegments = new Queue<GameObject>();
-    private Transform player;
-
-    void Start()
-    {
-        player = FindObjectOfType<PlayerController>()?.transform;
-
-        if (player == null)
-        {
-            Debug.LogError("PlayerController not found! Ensure a player object is in the scene.");
-        }
-    }
 
     public void InitializeRoads(Vector3 startPosition, Quaternion rotation, float scaleFactor)
     {
@@ -36,19 +25,27 @@ public class RoadManager : MonoBehaviour
         Debug.Log("Roads initialized.");
     }
 
-    void Update()
+    public void UpdateRoads(float speed)
     {
-        if (player == null) return;
-
-        float playerZ = player.position.z;
-
-        if (roadSegments.Count > 0 && roadSegments.Peek().transform.position.z + roadLength < playerZ)
+        foreach (GameObject road in roadSegments)
         {
-            RecycleRoad();
+            road.transform.position -= new Vector3(0, 0, speed * Time.deltaTime);
+        }
+
+        // Recycle the road segment when it moves far enough behind
+        if (roadSegments.Count > 0)
+        {
+            GameObject firstRoad = roadSegments.Peek();
+
+            // Check if the first road has moved far enough behind
+            if (firstRoad.transform.position.z < -roadLength)
+            {
+                RecycleRoad();
+            }
         }
     }
 
-    public void RecycleRoad()
+    private void RecycleRoad()
     {
         if (roadSegments.Count == 0)
         {
@@ -57,11 +54,18 @@ public class RoadManager : MonoBehaviour
         }
 
         GameObject oldestRoad = roadSegments.Dequeue();
-        Vector3 newPosition = oldestRoad.transform.position + new Vector3(0, 0, roadLength * roadSegments.Count);
-        oldestRoad.transform.position = newPosition;
-        roadSegments.Enqueue(oldestRoad);
+        GameObject lastRoad = roadSegments.ToArray()[roadSegments.Count - 1];
+        Vector3 newPosition = lastRoad.transform.position + new Vector3(0, 0, roadLength);
 
-        Debug.Log($"Recycled road to position: {newPosition}");
+        // Snap position to prevent any gaps
+        oldestRoad.transform.position = new Vector3(
+            Mathf.Round(newPosition.x * 100f) / 100f,
+            Mathf.Round(newPosition.y * 100f) / 100f,
+            Mathf.Round(newPosition.z * 100f) / 100f
+        );
+
+        roadSegments.Enqueue(oldestRoad);
+        Debug.Log($"Recycled road to position: {oldestRoad.transform.position}");
     }
 
     private void ClearRoads()
@@ -70,7 +74,6 @@ public class RoadManager : MonoBehaviour
         {
             Destroy(road);
         }
-
         roadSegments.Clear();
     }
 }

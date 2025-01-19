@@ -1,4 +1,3 @@
-// ARCarPlacement.cs
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
@@ -11,7 +10,6 @@ public class ARCarPlacement : MonoBehaviour
     public float carYOffset = 0.5f;
 
     private GameObject spawnedCar;
-    private GameObject spawnedRoad;
     private bool roadsInitialized = false;
     private HashSet<string> trackedImages = new HashSet<string>();
 
@@ -40,18 +38,12 @@ public class ARCarPlacement : MonoBehaviour
             PlaceObjects(trackedImage);
         }
 
-        foreach (var trackedImage in eventArgs.updated)
-        {
-            PlaceObjects(trackedImage);
-        }
-
         foreach (var trackedImage in eventArgs.removed)
         {
             RemoveObjects(trackedImage);
         }
     }
 
-    // ARCarPlacement.cs
     private void PlaceObjects(ARTrackedImage trackedImage)
     {
         if (roadsInitialized) return;
@@ -60,8 +52,9 @@ public class ARCarPlacement : MonoBehaviour
         Quaternion rotation = trackedImage.transform.rotation;
 
         float roadScaleFactor = trackedImage.size.x;
-        spawnedRoad = Instantiate(roadPrefab, position, rotation);
-        spawnedRoad.transform.localScale = new Vector3(roadScaleFactor, 1, roadScaleFactor);
+        spawnedCar = Instantiate(carPrefab, position, rotation);
+        spawnedCar.transform.localScale = new Vector3(roadScaleFactor * 0.8f, roadScaleFactor * 0.8f, roadScaleFactor * 0.8f);
+        spawnedCar.transform.position += new Vector3(0, carYOffset, 0);
 
         RoadManager roadManager = FindObjectOfType<RoadManager>();
         if (roadManager != null)
@@ -69,13 +62,9 @@ public class ARCarPlacement : MonoBehaviour
             roadManager.InitializeRoads(position, rotation, roadScaleFactor);
         }
 
-        spawnedCar = Instantiate(carPrefab, position, rotation);
-        spawnedCar.transform.position += new Vector3(0, carYOffset, 0);
-
         roadsInitialized = true;
         GameManager.StartGame();
     }
-
 
     private void RemoveObjects(ARTrackedImage trackedImage)
     {
@@ -84,7 +73,6 @@ public class ARCarPlacement : MonoBehaviour
             trackedImages.Remove(trackedImage.referenceImage.name);
 
             if (spawnedCar != null) Destroy(spawnedCar);
-            if (spawnedRoad != null) Destroy(spawnedRoad);
         }
     }
 }
