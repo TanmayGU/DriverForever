@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour
         audioSource.clip.GetData(audioSamples, 0);
         float volume = GetVolume(audioSamples);
 
-        float silenceThreshold = 0.003f;
+        float silenceThreshold = 0.0003f;
         float lowVolumeThreshold = 0.1f;
         float highVolumeThreshold = 0.3f;
 
@@ -114,12 +114,12 @@ public class PlayerController : MonoBehaviour
         }
         else if (volume < lowVolumeThreshold)
         {
-            targetScale = new Vector3(originalScale.x * 1.4f, originalScale.y * 0.6f, originalScale.z);
+            targetScale = new Vector3(originalScale.x * 1.5f, originalScale.y * 0.5f, originalScale.z);
             Debug.Log("Low Volume detected: Shrinking to wide and short form.");
         }
         else if (volume > highVolumeThreshold)
         {
-            targetScale = new Vector3(originalScale.x * 0.6f, originalScale.y * 1.4f, originalScale.z);
+            targetScale = new Vector3(originalScale.x * 0.5f, originalScale.y * 1.5f, originalScale.z);
             Debug.Log("High Volume detected: Stretching to tall and thin form.");
         }
         else
