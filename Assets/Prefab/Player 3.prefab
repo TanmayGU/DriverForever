@@ -64,8 +64,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2926557707537190794, guid: 48ec00ff66ab6dd47b90e324c79929a5, type: 3}
+  m_Materials: []
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -148,7 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98ff65d48b44e14a97c3ebe7ef8e099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laneFactor: 0.33
+  laneFactor: 0.88
+  roadSpeed: 10
 --- !u!1001 &3017356693439416643
 PrefabInstance:
   m_ObjectHideFlags: 0

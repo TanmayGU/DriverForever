@@ -1,6 +1,5 @@
-// GameManager.cs
 using UnityEngine;
-using UnityEngine.XR.ARFoundation; // Ensure this namespace is included
+using UnityEngine.XR.ARFoundation;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,11 +11,11 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Ensure the instance persists across scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject); // Prevent duplicates
+            Destroy(gameObject);
         }
     }
 
