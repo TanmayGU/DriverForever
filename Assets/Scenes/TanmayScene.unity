@@ -501,10 +501,9 @@ MonoBehaviour:
   - {fileID: 5868874755195600141, guid: 5743c823e180296468a1c5af78862a39, type: 3}
   - {fileID: 2569224724549011724, guid: 321b194a4e54ba549b9088285251c184, type: 3}
   - {fileID: 2569224724549011724, guid: 321b194a4e54ba549b9088285251c184, type: 3}
-  zSpawn: 0
-  roadLenght: 30
-  numberOfRoads: 3
   playerTransform: {fileID: 92882953}
+  roadLength: 30
+  numberOfRoads: 3
 --- !u!4 &1664290812
 Transform:
   m_ObjectHideFlags: 0
@@ -818,6 +817,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7710056192946883355, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7710056192946883355, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
       propertyPath: forwardSpeed
       value: 10
       objectReference: {fileID: 0}
@@ -831,8 +834,34 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6768994452558437594, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2126818310}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2658240711231111471, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5479527168077565001}
   m_SourcePrefab: {fileID: 100100000, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
+--- !u!1 &5479527168077565000 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2658240711231111471, guid: 535f63cb1872c264592fda6dc0847d24, type: 3}
+  m_PrefabInstance: {fileID: 5479527168077564999}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5479527168077565001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5479527168077565000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c240004aacec5b64d936bdf3cb4d3375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardSpeed: 5
+  laneDistance: 2.5
+  jumpForce: 10
+  Gravity: -20
+  squeezeSpeed: 5
+  volumeThreshold: 0.02
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
