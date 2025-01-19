@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 851037872527087728}
   - component: {fileID: 6097298069764629586}
   - component: {fileID: 5850978578757220938}
-  - component: {fileID: 4916503917211176674}
+  - component: {fileID: 1394157204580418385}
+  - component: {fileID: 1285590296452051373}
   m_Layer: 0
   m_Name: Player 3
   m_TagString: Player
@@ -135,7 +136,7 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4916503917211176674
+--- !u!114 &1394157204580418385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -143,6 +144,24 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8718404262838426138}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9984b97e828ce484c80dbc66a5641e8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardSpeed: 5
+  laneDistance: 2.5
+  jumpForce: 10
+  Gravity: -20
+  squeezeSpeed: 5
+  volumeThreshold: 0.02
+--- !u!114 &1285590296452051373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8718404262838426138}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b98ff65d48b44e14a97c3ebe7ef8e099, type: 3}
   m_Name: 

@@ -26,11 +26,23 @@ public class PlayerControllerJasonTest : MonoBehaviour
     private float[] audioSamples = new float[sampleSize];
     public float volumeThreshold = 0.02f; // Volume threshold
 
+    //private RoadManager roadManager;
+    //public float laneFactor = 0.88f; // Ideal lane distance for a road width of 0.3428473m
+    //private float baseRoadWidth = 0.3428473f; // The reference width for ideal laneFactor
+
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         originalScale = transform.localScale;
         targetScale = originalScale;
+
+        //Looking for microphones
+        foreach (var device in Microphone.devices)
+        {
+            Debug.Log("Name: " + device);
+        }
+
 
         // Add AudioSource and connect it to the microphone
         audioSource = gameObject.AddComponent<AudioSource>();
@@ -58,12 +70,34 @@ public class PlayerControllerJasonTest : MonoBehaviour
         {
             Debug.LogError("No microphone detected!");
         }
+
+
+        //roadManager = FindObjectOfType<RoadManager>();
+        //if (roadManager != null && roadManager.roadPrefab != null)
+        //{
+        //    // Get the current road width dynamically
+        //    float currentRoadWidth = roadManager.roadPrefab.transform.localScale.x; // Or fetched from the image tracker
+        //    float imageWidth = GetTrackedImageWidth(); // Dynamically fetch the image width (if applicable)
+
+        //    // Calculate lane distance proportionally
+        //    laneDistance = laneFactor * (imageWidth / baseRoadWidth);
+
+        //    Debug.Log($"Dynamic lane distance calculated: {laneDistance} (Current road width: {imageWidth})");
+        //}
+        //else
+        //{
+        //    Debug.LogWarning("RoadManager or roadPrefab not found! Using default lane distance.");
+        //    laneDistance = 3f; // Default fallback
+        //}
+
+
     }
 
     void Update()
     {
         // Forward movement logic
         direction.z = forwardSpeed;
+        //roadManager.UpdateRoads(forwardSpeed);
 
         if (controller.isGrounded)
         {
@@ -180,4 +214,22 @@ public class PlayerControllerJasonTest : MonoBehaviour
     {
         targetScale = originalScale; // Restore default scale
     }
+
+
+    //private float GetTrackedImageWidth()
+    //{
+    //    // Fetch the width of the tracked image dynamically
+    //    ARCarPlacement arPlacement = FindObjectOfType<ARCarPlacement>();
+    //    if (arPlacement != null && arPlacement.imageManager != null)
+    //    {
+    //        foreach (var trackedImage in arPlacement.imageManager.trackables)
+    //        {
+    //            return trackedImage.size.x; // Dynamically return the width of the first tracked image
+    //        }
+    //    }
+
+    //    Debug.LogWarning("No tracked image width found. Using default value.");
+    //    return baseRoadWidth; // Fallback to the base reference width
+    //}
+
 }
