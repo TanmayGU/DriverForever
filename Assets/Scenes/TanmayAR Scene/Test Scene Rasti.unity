@@ -829,7 +829,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469dd7b334fc8d84d85eb3a2d8286372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roadPrefab: {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
+  roadPrefabs:
+  - {fileID: 5149666095502481305, guid: b716a4f851de6aa439f5590c00853a48, type: 3}
+  - {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
+  - {fileID: 1770140120794994178, guid: 9c84305af4698d84b86dfdd8011b683c, type: 3}
+  - {fileID: 1245480745740514487, guid: 1fbb3304e9369b94ca21b2680ed01ec3, type: 3}
+  - {fileID: 5868874755195600141, guid: 5743c823e180296468a1c5af78862a39, type: 3}
+  - {fileID: 2569224724549011724, guid: 321b194a4e54ba549b9088285251c184, type: 3}
   roadCount: 5
   roadLength: 15
   roadSpeed: 10
