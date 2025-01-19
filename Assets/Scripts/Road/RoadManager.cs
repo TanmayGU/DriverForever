@@ -59,25 +59,22 @@ public class RoadManager : MonoBehaviour
 
         // Remove the oldest road
         GameObject oldestRoad = roadSegments.Dequeue();
+        Destroy(oldestRoad); // Destroy the old road to ensure a fresh random road
 
         // Get the last road's position
         GameObject lastRoad = roadSegments.ToArray()[roadSegments.Count - 1];
         Vector3 newPosition = lastRoad.transform.position + new Vector3(0, 0, roadLength);
 
-        // Reset the position
-        oldestRoad.transform.position = new Vector3(
-            Mathf.Round(newPosition.x * 100f) / 100f,
-            Mathf.Round(newPosition.y * 100f) / 100f,
-            Mathf.Round(newPosition.z * 100f) / 100f
-        );
+        // Instantiate a new random road prefab
+        GameObject newRoad = Instantiate(GetRandomRoadPrefab(), newPosition, Quaternion.identity);
 
-        // Reset scale to the stored scale factor
-        oldestRoad.transform.localScale = new Vector3(storedScaleFactor, 1, storedScaleFactor);
+        // Apply the stored scale factor
+        newRoad.transform.localScale = new Vector3(storedScaleFactor, 1, storedScaleFactor);
 
-        // Re-enqueue the recycled road
-        roadSegments.Enqueue(oldestRoad);
+        // Enqueue the new road
+        roadSegments.Enqueue(newRoad);
 
-        Debug.Log($"Recycled road to position: {oldestRoad.transform.position}");
+        Debug.Log($"Added new random road at position: {newRoad.transform.position}");
     }
 
     private GameObject GetRandomRoadPrefab()
