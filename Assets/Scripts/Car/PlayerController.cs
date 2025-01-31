@@ -199,6 +199,6 @@ public class PlayerController : MonoBehaviour
     private void GameOver()
     {
         Debug.Log("Game Over!");
-        SceneManager.LoadScene("GameOverScene"); // Load a game-over scene
+        SceneManager.LoadScene("End"); // Load a game-over scene
     }
 }
