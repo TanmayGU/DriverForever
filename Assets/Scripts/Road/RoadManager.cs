@@ -24,7 +24,7 @@ public class RoadManager : MonoBehaviour
         {
             Vector3 position = startPosition + new Vector3(0, 0, i * roadLength);
             GameObject road = Instantiate(GetRandomRoadPrefab(), position, rotation);
-            road.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
+            road.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
             roadSegments.Enqueue(road);
         }
 

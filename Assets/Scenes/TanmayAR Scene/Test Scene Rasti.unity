@@ -771,6 +771,7 @@ MonoBehaviour:
   roadPrefab: {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
   imageManager: {fileID: 411006528}
   carYOffset: 0.5
+  scanCanvas: {fileID: 1792998687}
 --- !u!4 &1039885303
 Transform:
   m_ObjectHideFlags: 0

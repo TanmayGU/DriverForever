@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/TanmayAR Scene/TestScene Rasti.unity
     guid: 46f1dfd91f863f84cbcae57885168c22
   - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 6976012de6bcecd47ad1564ce4873407
+  - enabled: 0
     path: Assets/Scenes/Main Menu.unity
     guid: e351ed85de8f54d4ab8df2d52d4b2cd1
   - enabled: 1
@@ -17,9 +20,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/End.unity
     guid: de8d076d36f2ae349a4006b565ec4c71
-  - enabled: 1
-    path: Assets/Scenes/Start.unity
-    guid: 6976012de6bcecd47ad1564ce4873407
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 408b822ccb7fd5a46a1506cf5ebf29d2, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: a07fe4e3513e54e46984a2494c5b785a, type: 2}

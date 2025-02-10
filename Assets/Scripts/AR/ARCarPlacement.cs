@@ -13,6 +13,8 @@ public class ARCarPlacement : MonoBehaviour
     private bool roadsInitialized = false;
     private HashSet<string> trackedImages = new HashSet<string>();
 
+    public GameObject scanCanvas;
+
     private void OnEnable()
     {
         if (imageManager != null)
@@ -53,7 +55,7 @@ public class ARCarPlacement : MonoBehaviour
 
         float roadScaleFactor = trackedImage.size.x;
         spawnedCar = Instantiate(carPrefab, position, rotation);
-        spawnedCar.transform.localScale = new Vector3(roadScaleFactor * 0.8f, roadScaleFactor * 0.8f, roadScaleFactor * 0.8f);
+        //spawnedCar.transform.localScale = new Vector3(roadScaleFactor * 0.8f, roadScaleFactor * 0.8f, roadScaleFactor * 0.8f);
         spawnedCar.transform.position += new Vector3(0, carYOffset, 0);
 
         RoadManager roadManager = FindObjectOfType<RoadManager>();
@@ -63,6 +65,7 @@ public class ARCarPlacement : MonoBehaviour
         }
 
         roadsInitialized = true;
+        scanCanvas.SetActive(false);
         GameManager.StartGame();
     }
 

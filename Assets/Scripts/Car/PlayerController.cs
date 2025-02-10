@@ -196,6 +196,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+            // Check if the collided object is tagged as "Wall"
+            if (other.gameObject.CompareTag("Wall"))
+            {
+                hitCount++; // Increment the hit counter
+                Debug.Log("Wall hit count: " + hitCount);
+
+                if (hitCount >= maxHits)
+                {
+                    GameOver(); // Trigger the game-over logic
+                }
+            }
+        
+    }
     private void GameOver()
     {
         Debug.Log("Game Over!");

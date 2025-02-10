@@ -5,7 +5,6 @@ public class GameManager : MonoBehaviour
 {
     public static bool gameStarted = false;
     public static GameManager Instance { get; private set; }
-
     void Awake()
     {
         if (Instance == null)
@@ -51,4 +50,5 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("ARSession not found. Cannot reset.");
         }
     }
+
 }
