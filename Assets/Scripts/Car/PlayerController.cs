@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,11 +9,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetScale;
     public float squeezeSpeed = 5f;
 
+    public HeartManager heartManager; // Ensure this is public!
+
     private AudioSource audioSource;
     private const int sampleRate = 48000;
     private const int sampleSize = 1024;
     private float[] audioSamples = new float[sampleSize];
     public float volumeThreshold = 0.02f;
+ 
 
     public float laneFactor = 0.88f; // Ideal lane factor for a base road width
     private float laneDistance;
@@ -22,8 +26,7 @@ public class PlayerController : MonoBehaviour
     public float roadSpeed = 10f; // Speed at which roads move
     private float baseRoadWidth = 0.3428473f; // Reference road width for laneFactor calculation
 
-    private int hitCount = 0; // Counter for wall collisions
-    public int maxHits = 5; // Maximum number of hits before game over
+ 
 
     void Start()
     {
@@ -42,6 +45,19 @@ public class PlayerController : MonoBehaviour
         {
             Debug.LogWarning("RoadManager not found! Using default lane distance.");
             laneDistance = 3f; // Default fallback
+        }
+
+        if (heartManager == null) 
+        {
+            heartManager = FindObjectOfType<HeartManager>();
+            if (heartManager == null)
+            {
+                Debug.LogError("❌ ERROR: HeartManager not found in the scene! Make sure it's active.");
+            }
+            else
+            {
+                Debug.Log("✅ HeartManager found successfully!");
+            }
         }
     }
 
@@ -181,39 +197,41 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Moved to lane {desiredLane}");
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Check if the collided object is tagged as "Wall"
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            hitCount++; // Increment the hit counter
-            Debug.Log("Wall hit count: " + hitCount);
-
-            if (hitCount >= maxHits)
-            {
-                GameOver(); // Trigger the game-over logic
-            }
-        }
-    }
+    private bool recentlyHit = false; // ✅ Cooldown flag
 
     private void OnTriggerEnter(Collider other)
     {
-            // Check if the collided object is tagged as "Wall"
-            if (other.gameObject.CompareTag("Wall"))
-            {
-                hitCount++; // Increment the hit counter
-                Debug.Log("Wall hit count: " + hitCount);
+        Debug.Log($"Triggered by: {other.gameObject.name} (Tag: {other.gameObject.tag})");
 
-                if (hitCount >= maxHits)
-                {
-                    GameOver(); // Trigger the game-over logic
-                }
+        if (other.gameObject.CompareTag("Wall") && !recentlyHit)
+        {
+            recentlyHit = true; // ✅ Prevent immediate double-triggering
+            Debug.Log("✅ Wall hit detected! Calling LoseHeart()...");
+
+            if (heartManager != null)
+            {
+                heartManager.LoseHeart();
             }
-        
+            else
+            {
+                Debug.LogError("❌ ERROR: HeartManager reference is null!");
+            }
+
+            // Reset cooldown after a small delay
+            StartCoroutine(ResetHitCooldown());
+        }
     }
-    private void GameOver()
+
+    // ✅ Cooldown to prevent multiple triggers at the same time
+    private IEnumerator ResetHitCooldown()
     {
-        Debug.Log("Game Over!");
-        SceneManager.LoadScene("End"); // Load a game-over scene
+        yield return new WaitForSeconds(0.2f); // Adjust time as needed
+        recentlyHit = false;
     }
+
 }
+
+
+
+
+

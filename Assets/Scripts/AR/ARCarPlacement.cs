@@ -1,12 +1,15 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using Unity.XR.CoreUtils;
 
 public class ARCarPlacement : MonoBehaviour
 {
     public GameObject carPrefab;
     public GameObject roadPrefab;
     public ARTrackedImageManager imageManager;
+    private ARSession arSession;
     public float carYOffset = 0.5f;
 
     private GameObject spawnedCar;
@@ -14,13 +17,58 @@ public class ARCarPlacement : MonoBehaviour
     private HashSet<string> trackedImages = new HashSet<string>();
 
     public GameObject scanCanvas;
+   
+
+    private void Awake()
+    {
+        Debug.Log("ARCarPlacement:Awake() - Ensuring single instance.");
+        if (FindObjectsOfType<ARCarPlacement>().Length > 1)
+        {
+            Debug.LogWarning("Multiple ARCarPlacement instances found! Destroying duplicate...");
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void OnEnable()
     {
+        Debug.Log("ARCarPlacement:OnEnable()");
+        StartCoroutine(InitializeAR());
+    }
+
+    private IEnumerator InitializeAR()
+    {
+        Debug.Log("Initializing AR system...");
+        arSession = FindObjectOfType<ARSession>();
+
+        if (arSession == null)
+        {
+            Debug.LogWarning("ARSession not found. Waiting for initialization...");
+            float waitTime = 0f;
+            while (arSession == null && waitTime < 5f)
+            {
+                arSession = FindObjectOfType<ARSession>();
+                yield return new WaitForSeconds(0.5f);
+                waitTime += 0.5f;
+            }
+        }
+
+        if (arSession == null)
+        {
+            Debug.LogError("ARSession still not found! AR may not work.");
+            yield break;
+        }
+
+        Debug.Log("ARSession is now active.");
+        yield return new WaitForSeconds(2f);
+
+        Debug.Log("Resetting AR session before enabling tracking...");
+        StartCoroutine(ResetARSessionCompletely());
+
         if (imageManager != null)
         {
             imageManager.trackedImagesChanged += OnTrackedImagesChanged;
-            Debug.Log("ARTrackedImageManager.trackedImagesChanged event subscribed in ARCarPlacement.");
+            Debug.Log("Subscribed to ARTrackedImageManager.trackedImagesChanged.");
         }
     }
 
@@ -29,7 +77,7 @@ public class ARCarPlacement : MonoBehaviour
         if (imageManager != null)
         {
             imageManager.trackedImagesChanged -= OnTrackedImagesChanged;
-            Debug.Log("ARTrackedImageManager.trackedImagesChanged event unsubscribed in ARCarPlacement.");
+            Debug.Log("Unsubscribed from ARTrackedImageManager.trackedImagesChanged.");
         }
     }
 
@@ -39,29 +87,29 @@ public class ARCarPlacement : MonoBehaviour
         {
             PlaceObjects(trackedImage);
         }
-
-        foreach (var trackedImage in eventArgs.removed)
-        {
-            RemoveObjects(trackedImage);
-        }
     }
 
     private void PlaceObjects(ARTrackedImage trackedImage)
     {
-        if (roadsInitialized) return;
+        if (roadsInitialized)
+        {
+            Debug.LogWarning("Placement blocked! roadsInitialized is true.");
+            return;
+        }
 
         Vector3 position = trackedImage.transform.position;
-        Quaternion rotation = trackedImage.transform.rotation;
 
-        float roadScaleFactor = trackedImage.size.x;
-        spawnedCar = Instantiate(carPrefab, position, rotation);
-        //spawnedCar.transform.localScale = new Vector3(roadScaleFactor * 0.8f, roadScaleFactor * 0.8f, roadScaleFactor * 0.8f);
+        // Force car to face forward (Z-axis) instead of using AR image rotation
+        Quaternion fixedRotation = Quaternion.Euler(0, 0, 0);
+
+        spawnedCar = Instantiate(carPrefab, position, fixedRotation);
         spawnedCar.transform.position += new Vector3(0, carYOffset, 0);
 
         RoadManager roadManager = FindObjectOfType<RoadManager>();
         if (roadManager != null)
         {
-            roadManager.InitializeRoads(position, rotation, roadScaleFactor);
+            float roadScaleFactor = (trackedImage.size.x) * 1.5f;
+            roadManager.InitializeRoads(position, Quaternion.identity, roadScaleFactor);
         }
 
         roadsInitialized = true;
@@ -69,13 +117,52 @@ public class ARCarPlacement : MonoBehaviour
         GameManager.StartGame();
     }
 
-    private void RemoveObjects(ARTrackedImage trackedImage)
-    {
-        if (trackedImages.Contains(trackedImage.referenceImage.name))
-        {
-            trackedImages.Remove(trackedImage.referenceImage.name);
 
-            if (spawnedCar != null) Destroy(spawnedCar);
+    public IEnumerator ResetARSessionCompletely()
+    {
+        Debug.Log("Starting full AR session reset...");
+
+        if (arSession == null)
+        {
+            Debug.LogWarning("ARSession not found. Trying again...");
+            arSession = FindObjectOfType<ARSession>();
+
+            if (arSession == null)
+            {
+                Debug.LogError("ERROR: ARSession still not found! Cannot reset.");
+                yield break;
+            }
         }
+
+        while (arSession.subsystem != null && arSession.subsystem.running == false)
+        {
+            Debug.LogWarning("Waiting for ARSession to start...");
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        Debug.Log("Resetting ARSession...");
+        try
+        {
+            arSession.Reset();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("CRITICAL ERROR: Failed to reset ARSession! " + e.Message);
+            yield break;
+        }
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (imageManager != null)
+        {
+            Debug.Log("Restarting ARTrackedImageManager...");
+            imageManager.enabled = false;
+            yield return new WaitForSeconds(1f);
+            imageManager.enabled = true;
+        }
+
+        yield return new WaitForSeconds(1f);
+        scanCanvas.SetActive(false); // Fix: Keep it hidden
+        Debug.Log("ARSession fully reset.");
     }
 }

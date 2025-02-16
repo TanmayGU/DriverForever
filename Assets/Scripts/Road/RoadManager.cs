@@ -1,34 +1,34 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class RoadManager : MonoBehaviour
 {
-    public GameObject[] roadPrefabs; // Array of road prefabs
+    public GameObject[] roadPrefabs;
     public int roadCount = 5;
-    public float roadLength = 15.0f; // Match prefab Z scale
+    public float roadLength = 15.0f * 1.5f;
     public float roadSpeed = 10f;
 
     private Queue<GameObject> roadSegments = new Queue<GameObject>();
+    private float storedScaleFactor = 1.0f;
 
-    // Add a read-only property to expose the road segments
     public IReadOnlyCollection<GameObject> RoadSegments => roadSegments;
-
-    private float storedScaleFactor = 1.0f; // Stores the scale factor for consistent scaling
 
     public void InitializeRoads(Vector3 startPosition, Quaternion rotation, float scaleFactor)
     {
         ClearRoads();
-        storedScaleFactor = scaleFactor; // Store the scale factor for consistent recycling
+        storedScaleFactor = scaleFactor;
+
+        Vector3 roadDirection = Vector3.forward * roadLength; // Ensures correct forward placement
 
         for (int i = 0; i < roadCount; i++)
         {
-            Vector3 position = startPosition + new Vector3(0, 0, i * roadLength);
-            GameObject road = Instantiate(GetRandomRoadPrefab(), position, rotation);
-            road.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);  //may need to change
+            Vector3 position = startPosition + (roadDirection * i); // Always along Z-axis
+            GameObject road = Instantiate(i == 0 ? roadPrefabs[0] : GetRandomRoadPrefab(), position, Quaternion.identity); // Ignore rotation
+            road.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
             roadSegments.Enqueue(road);
         }
 
-        Debug.Log("Roads initialized with random prefabs.");
+        Debug.Log("Roads initialized in a straight line.");
     }
 
     public void UpdateRoads(float speed)
@@ -41,7 +41,6 @@ public class RoadManager : MonoBehaviour
         if (roadSegments.Count > 0)
         {
             GameObject firstRoad = roadSegments.Peek();
-
             if (firstRoad.transform.position.z < -roadLength)
             {
                 RecycleRoad();
@@ -51,30 +50,17 @@ public class RoadManager : MonoBehaviour
 
     private void RecycleRoad()
     {
-        if (roadSegments.Count == 0)
-        {
-            Debug.LogWarning("No roads available to recycle!");
-            return;
-        }
+        if (roadSegments.Count == 0) return;
 
-        // Remove the oldest road
         GameObject oldestRoad = roadSegments.Dequeue();
-        Destroy(oldestRoad); // Destroy the old road to ensure a fresh random road
+        Destroy(oldestRoad);
 
-        // Get the last road's position
         GameObject lastRoad = roadSegments.ToArray()[roadSegments.Count - 1];
         Vector3 newPosition = lastRoad.transform.position + new Vector3(0, 0, roadLength);
 
-        // Instantiate a new random road prefab
         GameObject newRoad = Instantiate(GetRandomRoadPrefab(), newPosition, Quaternion.identity);
-
-        // Apply the stored scale factor
         newRoad.transform.localScale = new Vector3(storedScaleFactor, 1, storedScaleFactor);
-
-        // Enqueue the new road
         roadSegments.Enqueue(newRoad);
-
-        Debug.Log($"Added new random road at position: {newRoad.transform.position}");
     }
 
     private GameObject GetRandomRoadPrefab()
@@ -84,7 +70,7 @@ public class RoadManager : MonoBehaviour
             Debug.LogError("No road prefabs assigned!");
             return null;
         }
-        return roadPrefabs[Random.Range(0, roadPrefabs.Length)];
+        return roadPrefabs[Random.Range(1, roadPrefabs.Length)];
     }
 
     private void ClearRoads()
@@ -95,4 +81,14 @@ public class RoadManager : MonoBehaviour
         }
         roadSegments.Clear();
     }
+
+    public GameObject GetFirstRoad()
+    {
+        if (roadSegments.Count > 0)
+        {
+            return roadSegments.Peek();
+        }
+        return null;
+    }
+
 }

@@ -316,6 +316,7 @@ RectTransform:
   - {fileID: 1815035552}
   - {fileID: 2105279178}
   - {fileID: 959219606}
+  - {fileID: 1515503623}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -615,8 +616,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1515503624}
-        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+      - m_Target: {fileID: 1515503625}
+        m_TargetAssemblyTypeName: GameOverManager, Assembly-CSharp
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
@@ -1019,6 +1020,7 @@ GameObject:
   - component: {fileID: 1515503623}
   - component: {fileID: 1515503622}
   - component: {fileID: 1515503621}
+  - component: {fileID: 1515503625}
   - component: {fileID: 1515503624}
   m_Layer: 0
   m_Name: EventSystem
@@ -1070,12 +1072,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1515503620}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -540, y: -263.13702, z: 0}
+  m_LocalScale: {x: 0.66955984, y: 0.66955984, z: 0.66955984}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 737310279}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1515503624
 MonoBehaviour:
@@ -1086,9 +1088,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1515503620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01ae0062f6bb7084ea4897999278d53e, type: 3}
+  m_Script: {fileID: 11500000, guid: 40585e6635b8ee04e9f1cf3043136529, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arSceneName: Test Scene Rasti
+--- !u!114 &1515503625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515503620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40585e6635b8ee04e9f1cf3043136529, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arSceneName: Test Scene Rasti
 --- !u!1 &1815035551
 GameObject:
   m_ObjectHideFlags: 0
@@ -1399,8 +1415,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1515503624}
-        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: PlayGame
+        m_TargetAssemblyTypeName: GameOverManager, Assembly-CSharp
+        m_MethodName: TryAgain
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1455,4 +1471,3 @@ SceneRoots:
   - {fileID: 1893914317}
   - {fileID: 645346991}
   - {fileID: 737310279}
-  - {fileID: 1515503623}
