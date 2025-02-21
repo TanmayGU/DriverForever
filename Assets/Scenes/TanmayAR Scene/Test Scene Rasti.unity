@@ -1070,7 +1070,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5cd8a1ab66fcf94589c5970ac99f3ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPrefab: {fileID: 8718404262838426138, guid: 3ac581c787233e744b0d694850ff80be, type: 3}
+  carPrefab: {fileID: 659893209954950975, guid: e8288da8d77c1f64291b993894b0e534, type: 3}
   roadPrefab: {fileID: 3672342262761636483, guid: dd549db3cdacdb04e85f7df27c24ebe9, type: 3}
   imageManager: {fileID: 411006528}
   carYOffset: 0.5
