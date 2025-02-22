@@ -3,7 +3,8 @@ guid: 5702f4f5069610d44bc51fb64f84ad90
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - heartCanvas: {fileID: 3267229501918237155, guid: fecbfacf93bc7c949aadea9ad568c4e0, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -9,31 +9,32 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetScale;
     public float squeezeSpeed = 5f;
 
-    public HeartManager heartManager; // Ensure this is public!
+    private HeartManager heartManager;
 
     private AudioSource audioSource;
     private const int sampleRate = 48000;
     private const int sampleSize = 1024;
     private float[] audioSamples = new float[sampleSize];
     public float volumeThreshold = 0.02f;
- 
 
-    public float laneFactor = 0.88f; // Ideal lane factor for a base road width
+    public float laneFactor = 0.88f; // Determines lane positioning based on road width
     private float laneDistance;
     private int desiredLane = 1; // Default to center lane
     private RoadManager roadManager;
 
     public float roadSpeed = 10f; // Speed at which roads move
-    private float baseRoadWidth = 0.3428473f; // Reference road width for laneFactor calculation
-
- 
+    private float baseRoadWidth = 0.3428473f; // Reference road width for lane factor calculation
 
     void Start()
     {
+        // Store original scale for later transformations
         originalScale = transform.localScale;
         targetScale = originalScale;
+
+        // Initialize microphone for audio input
         InitializeMicrophone();
 
+        // Find the road manager in the scene
         roadManager = FindObjectOfType<RoadManager>();
         if (roadManager != null)
         {
@@ -44,52 +45,57 @@ public class PlayerController : MonoBehaviour
         else
         {
             Debug.LogWarning("RoadManager not found! Using default lane distance.");
-            laneDistance = 3f; // Default fallback
+            laneDistance = 3f; // Default fallback value
         }
 
-        if (heartManager == null) 
+        // Find the HeartManager instance in the scene
+        heartManager = FindObjectOfType<HeartManager>();
+
+        if (heartManager == null)
         {
-            heartManager = FindObjectOfType<HeartManager>();
-            if (heartManager == null)
-            {
-                Debug.LogError("❌ ERROR: HeartManager not found in the scene! Make sure it's active.");
-            }
-            else
-            {
-                Debug.Log("✅ HeartManager found successfully!");
-            }
+            Debug.LogError("HeartManager not found!");
+        }
+        else
+        {
+            Debug.Log("HeartManager assigned successfully!");
         }
     }
 
     void Update()
     {
+        // Process audio input and update scaling effect
         AnalyzeAudio();
 
         if (!GameManager.gameStarted) return;
 
+        // Handle user input for movement
         HandleTouchInput();
 
-        // Move roads
+        // Move road segments according to game speed
         roadManager.UpdateRoads(roadSpeed);
 
-        // Adjust position based on the desired lane
-        float targetX = (desiredLane - 1) * laneDistance; // Center lane is 1
+        // Calculate target position based on lane choice
+        float targetX = (desiredLane - 1) * laneDistance;
         Vector3 targetPosition = new Vector3(targetX, transform.position.y, transform.position.z);
 
+        // Smoothly transition the player towards the target lane position
         transform.position = Vector3.Lerp(transform.position, targetPosition, 10f * Time.deltaTime);
     }
 
     private void InitializeMicrophone()
     {
+        // Add an audio source component dynamically
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.loop = true;
         audioSource.mute = true;
 
+        // Check if a microphone is available and start recording
         if (Microphone.devices.Length > 0)
         {
             string selectedMic = Microphone.devices[0];
             audioSource.clip = Microphone.Start(selectedMic, true, 1, sampleRate);
 
+            // Ensure the microphone is recording before playing
             if (Microphone.IsRecording(selectedMic))
             {
                 Debug.Log($"Microphone '{selectedMic}' is recording.");
@@ -116,6 +122,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // Read audio data from the microphone input
         audioSource.clip.GetData(audioSamples, 0);
         float volume = GetVolume(audioSamples);
 
@@ -123,6 +130,7 @@ public class PlayerController : MonoBehaviour
         float lowVolumeThreshold = 0.1f;
         float highVolumeThreshold = 0.3f;
 
+        // Adjust player shape based on volume levels
         if (volume < silenceThreshold)
         {
             targetScale = originalScale;
@@ -144,6 +152,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Normal Volume: Keeping original shape.");
         }
 
+        // Smoothly interpolate between the current scale and the target scale
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * squeezeSpeed);
     }
 
@@ -167,11 +176,11 @@ public class PlayerController : MonoBehaviour
     {
         foreach (GameObject road in roadManager.RoadSegments)
         {
-            return road.transform.localScale.x; // Dynamic width of the road prefab
+            return road.transform.localScale.x; // Get the width of the road segment
         }
 
         Debug.LogWarning("No road segments found. Using base road width.");
-        return baseRoadWidth; // Fallback to the base reference width
+        return baseRoadWidth;
     }
 
     private void HandleTouchInput()
@@ -180,6 +189,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 touchPosition = Input.GetTouch(0).position;
 
+            // Determine movement direction based on screen touch position
             if (touchPosition.x < Screen.width / 2) MoveLeft();
             else MoveRight();
         }
@@ -197,41 +207,34 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Moved to lane {desiredLane}");
     }
 
-    private bool recentlyHit = false; // ✅ Cooldown flag
+    private bool recentlyHit = false; // Cooldown flag to prevent immediate re-triggering
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Triggered by: {other.gameObject.name} (Tag: {other.gameObject.tag})");
-
         if (other.gameObject.CompareTag("Wall") && !recentlyHit)
         {
-            recentlyHit = true; // ✅ Prevent immediate double-triggering
-            Debug.Log("✅ Wall hit detected! Calling LoseHeart()...");
+            recentlyHit = true; // Prevent immediate double-triggering
+            Debug.Log("Wall hit detected! Calling LoseHeart()...");
 
+            // Call LoseHeart only if the HeartManager is available
             if (heartManager != null)
             {
                 heartManager.LoseHeart();
             }
             else
             {
-                Debug.LogError("❌ ERROR: HeartManager reference is null!");
+                Debug.LogError("HeartManager reference is null!");
             }
 
-            // Reset cooldown after a small delay
+            // Reset the hit cooldown after a short delay
             StartCoroutine(ResetHitCooldown());
         }
     }
 
-    // ✅ Cooldown to prevent multiple triggers at the same time
+    // Cooldown to prevent multiple triggers within a short time
     private IEnumerator ResetHitCooldown()
     {
-        yield return new WaitForSeconds(0.2f); // Adjust time as needed
+        yield return new WaitForSeconds(0.2f);
         recentlyHit = false;
     }
-
 }
-
-
-
-
-

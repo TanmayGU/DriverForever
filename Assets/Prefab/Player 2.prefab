@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   squeezeSpeed: 5
-  heartManager: {fileID: 0}
+  heartManagerPrefab: {fileID: 9216149685952356556, guid: d715e968032b99a42b879455820abf17, type: 3}
   volumeThreshold: 0.02
   laneFactor: 0.88
   roadSpeed: 10
